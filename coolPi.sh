@@ -39,7 +39,8 @@ do
 		# fan at 50% speed
 		gpio pwm $GPIO_PWM 100
 	elif [[ $cpuTemp -ge 100 ]]; then
-        gpio pwm $GPIO_PWM 200
+		# fan at full speed
+        	gpio pwm $GPIO_PWM 200
 	fi
 	# wait 10 seconds
 	sleep 10
