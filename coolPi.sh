@@ -24,6 +24,10 @@ gpio pwmr 200
 # generate pwm on gpio 26 of 1/4 th duty cycle cause 50/200=1/4
 # gpio pwm 26 50
 
+# CPU temperature lower than 80'C? keep the fan off
+# CPU temperature between 80'C and 100'C? run the fan at 50% speed
+# CPU temperature bigger than 100'C? run fan at full speed
+
 while true
 do
 	temp=$(cat /sys/class/thermal/thermal_zone0/temp)
