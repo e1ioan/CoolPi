@@ -16,3 +16,6 @@ and adding at the bottom of the file:
 ```@reboot /home/pi/scripts/coolPi.sh```
 
 Reboot your Pi ```sudo reboot``` and you are done!
+
+The ```graph.sh``` script can be used to visualize the temperature and system usage on the Raspberry Pi. If you run it, it will create a png file that looks like this:
+
