@@ -14,7 +14,8 @@
 
 temp_db="/home/pi/data/cpu_db.rrd"
 
-# if it dosn't exist, create the rrdtool db to keep track of the pi temperature and usage
+# if it dosn't exist, create the rrdtool db to keep track of the pi temperature and usage. 
+# you can erase this if you don't want to keep track of the temperature and usage
 if [ ! -e "$temp_db" ]; then
 	/usr/bin/rrdtool create $temp_db --step 10 DS:temp:GAUGE:30:0:200 DS:cpu:GAUGE:30:0:100 RRA:MAX:0.5:1:10080
 fi
@@ -44,10 +45,8 @@ do
 	cpuTemp=$(($temp / 1000))
 	one=$( bc -l <<< "$one*100" )
 	# echo "$cpuTemp":"$one"
-	# log temp and cpu usage to db
-	#rrdtool update $temp_db temp N:$cpuTemp
-	#rrdtool update $temp_db cpu N:$one
-        rrdtool update "$temp_db" --template temp:cpu N:"$cpuTemp":"$one"
+	# log temp and cpu usage to db. You can erase this if you don't need this info
+    rrdtool update "$temp_db" --template temp:cpu N:"$cpuTemp":"$one"
 	if [[ $cpuTemp -lt 65 ]]; then
 		# stop fan
 		gpio pwm $GPIO_PWM 0
