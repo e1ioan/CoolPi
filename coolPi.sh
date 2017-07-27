@@ -12,6 +12,14 @@
 #To generate a 50 hz signal
 #50 Hz = 19.2e6 Hz / 1920 / 200
 
+temp_db="/home/pi/data/cpu_db.rrd"
+
+# if it dosn't exist, create the rrdtool db to keep track of the pi temperature and usage
+if [ ! -e "$temp_db" ]; then
+	/usr/bin/rrdtool create $temp_db --step 10 DS:temp:GAUGE:30:0:200 DS:cpu:GAUGE:30:0:100 RRA:MAX:0.5:1:10080
+fi
+
+# the pin GPIO 26 on the Pi
 GPIO_PWM=26
 
 #set gpio 26 as pwm
@@ -24,24 +32,32 @@ gpio pwmr 200
 # generate pwm on gpio 26 of 1/4 th duty cycle cause 50/200=1/4
 # gpio pwm 26 50
 
-# CPU temperature lower than 80'C? keep the fan off
+# CPU temperature lower than 65'C? turn the fan off
 # CPU temperature between 80'C and 100'C? run the fan at 50% speed
 # CPU temperature bigger than 100'C? run fan at full speed
 
 while true
 do
 	temp=$(cat /sys/class/thermal/thermal_zone0/temp)
-	cpuTemp=$(($temp/1000))
-	if [[ $cpuTemp -lt 80 ]]; then
+	# read cpu usage for 1, 5, 15 minutes
+	read one five fifteen rest < /proc/loadavg
+	cpuTemp=$(($temp / 1000))
+	one=$( bc -l <<< "$one*100" )
+	# echo "$cpuTemp":"$one"
+	# log temp and cpu usage to db
+	#rrdtool update $temp_db temp N:$cpuTemp
+	#rrdtool update $temp_db cpu N:$one
+        rrdtool update "$temp_db" --template temp:cpu N:"$cpuTemp":"$one"
+	if [[ $cpuTemp -lt 65 ]]; then
 		# stop fan
 		gpio pwm $GPIO_PWM 0
-	elif [ $cpuTemp -ge 80 ] && [ $cpuTemp -lt 100 ]; then
+	elif [ $cpuTemp -ge 65 ] && [ $cpuTemp -lt 100 ]; then
 		# fan at 50% speed
 		gpio pwm $GPIO_PWM 100
 	elif [[ $cpuTemp -ge 100 ]]; then
-		# fan at full speed
-        	gpio pwm $GPIO_PWM 200
+        gpio pwm $GPIO_PWM 200
 	fi
 	# wait 10 seconds
 	sleep 10
 done
+
