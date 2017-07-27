@@ -2,7 +2,7 @@
 
 temp_db="/home/pi/data/cpu_db.rrd"
 
-/usr/bin/rrdtool graph /home/pi/www/image/cpu.png --slope-mode --full-size-mode --right-axis 1:0 \
+/usr/bin/rrdtool graph /home/pi/cpu.png --slope-mode --full-size-mode --right-axis 1:0 \
 	--x-grid MINUTE:1:MINUTE:10:MINUTE:10:0:%H:%M --width 900 --height 400  -s 'now - 1 hours' -e 'now' \
 	DEF:TEMP=$temp_db:temp:MAX \
 	DEF:CPU=$temp_db:cpu:MAX \
